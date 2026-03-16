@@ -53,3 +53,8 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	return r
 }
+
+func (s *http.Server) RegisterRoutes() http.Handler{
+	r := gin.Default()
+	
+}

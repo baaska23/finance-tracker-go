@@ -5,3 +5,5 @@ type OtpData struct {
 	Message string `json:"message"`
 	Type    string `json:"type"`
 }
+
+
