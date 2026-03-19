@@ -26,6 +26,13 @@ func (t *transactionService) CreateTransaction(req Transaction) (*Transaction, e
 		Note: req.Note,
 		Category: req.Category,
 	}
-
 	return neu, nil
+}
+
+func (t *transactionService) ListTransaction() ([]Transaction, error) {
+    transactions, err := t.repo.List()
+    if err != nil {
+        return nil, err
+    }
+    return transactions, nil
 }

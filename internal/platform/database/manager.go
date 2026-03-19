@@ -1,24 +1,43 @@
 package database
 
 import (
-	"context"
+	"database/sql"
+	"fmt"
 	"log"
 	"os"
 
-	"github.com/jackc/pgx/v5"
 	"github.com/joho/godotenv"
+    _ "github.com/jackc/pgx/v5/stdlib"
 )
 
-func main() {
+type DBManager struct {
+    NeonDB *sql.DB
+}
+
+func NewDBManager() (*DBManager, error) {
+    manager := &DBManager{}
+
+    db, err := initNeon()
+    if err != nil {
+        return nil, fmt.Errorf("failed to init neon db: %w", &err)
+    }
+
+    manager.NeonDB = db
+
+    return manager, nil
+}
+
+func initNeon() (*sql.DB, error) {
     err := godotenv.Load()
     if err != nil {
-        log.Fatal("Error loading env file")
+        fmt.Errorf("Error loading env file")
     }
     connStr := os.Getenv("DATABASE_URL")
-    conn, connErr := pgx.Connect(context.Background(), connStr)
+    db, connErr := sql.Open("pgx", connStr)
     if connErr != nil {
         log.Fatal("Unable to connect to database:", connErr)
     }
-    defer conn.Close(context.Background())
+
     log.Println("Successfully connected")
+    return db, nil
 }

@@ -3,6 +3,8 @@ package transactions
 import (
 	"encoding/json"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 type TransactionHandler struct {
@@ -30,4 +32,13 @@ func (handler *TransactionHandler) Create(w http.ResponseWriter, r *http.Request
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(transaction)
+}
+
+func (handler *TransactionHandler) ListAll(c *gin.Context) {
+    transactions, err := handler.service.ListTransaction()
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+    c.JSON(http.StatusOK, transactions)
 }

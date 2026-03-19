@@ -1,27 +1,40 @@
 package server
 
 import (
-	"database/sql"
+	"fmt"
 	"ft-service/internal/domains/transactions"
-	"log"
+	"ft-service/internal/platform/database"
 	"net/http"
-	"os"
+	"time"
 )
 
-func StartServer() {
-	db, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))
-	if err != nil {
-		log.Fatal(err)
-	}
+type Server struct {
+	dbManager *database.DBManager
+	transactionHandler *transactions.TransactionHandler
+}
 
-	defer db.Close()
+func NewServer() *http.Server {
+    dbManager, err := database.NewDBManager()
+    if err != nil {
+        panic(fmt.Errorf("Failed to init database manager: %w", err))
+    }
 
-	repo := transactions.NewTransactionRepository(db)
-	service := transactions.NewTransactionService(*repo)
-	handler := transactions.NewTransactionHandler(*service)
+    transactionRepo := transactions.NewTransactionRepository(dbManager.NeonDB)
+    transactionService := transactions.NewTransactionService(transactionRepo)
+    transactionHandler := transactions.NewTransactionHandler(transactionService)
 
-	http.HandleFunc("/transactions", handler.Create)
+    srv := Server{
+        dbManager: dbManager,
+        transactionHandler: transactionHandler,
+    }
 
-	log.Println("Server running on :8080")
-	http.ListenAndServe(":8080", nil)
+    server := &http.Server{
+        Addr:         ":8080", // Make sure to set the port!
+        Handler:      srv.RegisterRoutes(),
+        IdleTimeout:  time.Minute,
+        ReadTimeout:  30 * time.Second,
+        WriteTimeout: 30 * time.Second,
+    }
+
+    return server
 }
