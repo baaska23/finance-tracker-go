@@ -11,15 +11,19 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r := gin.Default()
 
 	r.Use(cors.New(cors.Config{
-		AllowOrigins: 		[]string{"http://localhost:5173"},
-		AllowMethods: 		[]string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
-		AllowHeaders: 		[]string{"Accept", "Authorization", "Content-Type"},
-		AllowCredentials:   true,
+		AllowOrigins:     []string{"http://localhost:5173"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Accept", "Authorization", "Content-Type"},
+		AllowCredentials: true,
 	}))
 
 	transactionRoutes := r.Group("/transactions")
 	{
-		transactionRoutes.GET("/all", s.transactionHandler.ListAll)
+		transactionRoutes.GET("/all", s.TransactionHandler.ListAll)
+		transactionRoutes.GET("/", s.TransactionHandler.GetById)
+		transactionRoutes.PATCH("/", s.TransactionHandler.Update)
+		transactionRoutes.POST("/create", s.TransactionHandler.Create)
+		transactionRoutes.DELETE("/", s.TransactionHandler.Delete)
 	}
 
 	return r

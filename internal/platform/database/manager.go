@@ -6,38 +6,38 @@ import (
 	"log"
 	"os"
 
+	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/joho/godotenv"
-    _ "github.com/jackc/pgx/v5/stdlib"
 )
 
 type DBManager struct {
-    NeonDB *sql.DB
+	NeonDB *sql.DB
 }
 
 func NewDBManager() (*DBManager, error) {
-    manager := &DBManager{}
+	manager := &DBManager{}
 
-    db, err := initNeon()
-    if err != nil {
-        return nil, fmt.Errorf("failed to init neon db: %w", &err)
-    }
+	db, err := initNeon()
+	if err != nil {
+		return nil, fmt.Errorf("failed to init neon db: %w", &err)
+	}
 
-    manager.NeonDB = db
+	manager.NeonDB = db
 
-    return manager, nil
+	return manager, nil
 }
 
 func initNeon() (*sql.DB, error) {
-    err := godotenv.Load()
-    if err != nil {
-        fmt.Errorf("Error loading env file")
-    }
-    connStr := os.Getenv("DATABASE_URL")
-    db, connErr := sql.Open("pgx", connStr)
-    if connErr != nil {
-        log.Fatal("Unable to connect to database:", connErr)
-    }
+	err := godotenv.Load()
+	if err != nil {
+		fmt.Errorf("Error loading env file")
+	}
+	connStr := os.Getenv("DATABASE_URL")
+	db, connErr := sql.Open("pgx", connStr)
+	if connErr != nil {
+		log.Fatal("Unable to connect to database:", connErr)
+	}
 
-    log.Println("Successfully connected")
-    return db, nil
+	log.Println("Successfully connected")
+	return db, nil
 }

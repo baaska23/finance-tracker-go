@@ -1,0 +1,2 @@
+Uppercase - TransactionService - is exported and accessible from other packages
+Lowercase - transactionService - is unexported and accessible within the same package

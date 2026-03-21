@@ -1,38 +1,95 @@
 package transactions
 
 import (
+	"database/sql"
 	"errors"
 	"time"
 )
 
-type transactionService struct {
-	repo transactionRepository
+type TransactionService struct {
+	repo *TransactionRepository
 }
 
-func NewTransactionService(repo transactionRepository) *transactionService {
-	return &transactionService{repo: repo}
+func NewTransactionService(repo *TransactionRepository) *TransactionService {
+	return &TransactionService{repo: repo}
 }
 
-func (t *transactionService) CreateTransaction(req Transaction) (*Transaction, error) {
+func (t *TransactionService) CreateTransaction(req Transaction) (*Transaction, error) {
 	if req.Amount <= 0 {
 		return nil, errors.New("amount should be greater than 0")
 	}
 
-	neu := &Transaction{
-		TransactionId: req.TransactionId,
-		Amount: req.Amount,
-		Date: time.Now(),
-		CreatedAt: time.Now(),
-		Note: req.Note,
-		Category: req.Category,
+	newTransaction := &Transaction{
+		// TransactionId: int.serial
+		Amount:        req.Amount,
+		Date:          time.Now(),
+		CreatedAt:     time.Now(),
+		UpdatedAt:     sql.NullTime{},
+		Note:          req.Note,
+		Category:      req.Category,
+		SubCategoryId: req.SubCategoryId,
 	}
-	return neu, nil
+
+	err := t.repo.Create(newTransaction)
+	if err != nil {
+		return nil, err
+	}
+	return newTransaction, nil
 }
 
-func (t *transactionService) ListTransaction() ([]Transaction, error) {
-    transactions, err := t.repo.List()
-    if err != nil {
-        return nil, err
-    }
-    return transactions, nil
+func (t *TransactionService) UpdateTransaction(req TransactionPatch) (*Transaction, error) {
+	selectedTransaction, err := t.GetById(*req.TransactionId)
+	if err != nil {
+		return nil, err
+	}
+
+	if req.Amount != nil {
+		selectedTransaction.Amount = *req.Amount
+	}
+	if req.Date != nil {
+		selectedTransaction.Date = *req.Date
+	}
+	if req.Note != nil {
+		selectedTransaction.Note = *req.Note
+	}
+	if req.Category != nil {
+		selectedTransaction.Category = *req.Category
+	}
+
+	err = t.repo.Update(selectedTransaction)
+	if err != nil {
+		return nil, err
+	}
+
+	return selectedTransaction, nil
+}
+
+func (t *TransactionService) DeleteTransaction(req Transaction) (*Transaction, error) {
+	selectedTransaction, err := t.repo.GetById(req.TransactionId)
+	if err != nil {
+		return nil, err
+	}
+
+	err = t.repo.Delete(selectedTransaction)
+	if err != nil {
+		return nil, err
+	}
+
+	return selectedTransaction, nil
+}
+
+func (t *TransactionService) ListTransaction() ([]Transaction, error) {
+	transactions, err := t.repo.List()
+	if err != nil {
+		return nil, err
+	}
+	return transactions, nil
+}
+
+func (t *TransactionService) GetById(id int) (*Transaction, error) {
+	transaction, err := t.repo.GetById(id)
+	if err != nil {
+		return nil, err
+	}
+	return transaction, nil
 }
