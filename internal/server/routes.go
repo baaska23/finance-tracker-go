@@ -20,10 +20,13 @@ func (s *Server) RegisterRoutes() http.Handler {
 	transactionRoutes := r.Group("/transactions")
 	{
 		transactionRoutes.GET("/all", s.TransactionHandler.ListAll)
-		transactionRoutes.GET("/", s.TransactionHandler.GetById)
-		transactionRoutes.PATCH("/", s.TransactionHandler.Update)
+		transactionRoutes.GET("/:id", s.TransactionHandler.GetById)
+		transactionRoutes.GET("/expense", s.TransactionHandler.ListExpenses)
+		transactionRoutes.GET("/income", s.TransactionHandler.ListIncomes)
+
+		transactionRoutes.PATCH("/:id", s.TransactionHandler.Update)
 		transactionRoutes.POST("/create", s.TransactionHandler.Create)
-		transactionRoutes.DELETE("/", s.TransactionHandler.Delete)
+		transactionRoutes.DELETE("/:id", s.TransactionHandler.Delete)
 	}
 
 	return r

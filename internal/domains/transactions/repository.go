@@ -48,6 +48,72 @@ func (r *TransactionRepository) List() ([]Transaction, error) {
 	return transactions, nil
 }
 
+func (r *TransactionRepository) ListExpenses() ([]Transaction, error) {
+	rows, err := r.db.Query(`
+		SELECT * FROM transactions WHERE category = $1`, "expense")
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var transactions []Transaction
+
+	for rows.Next() {
+		var t Transaction
+		err := rows.Scan(
+			&t.TransactionId, // transaction_id
+			&t.Date,          // date
+			&t.CreatedAt,     // created_at
+			&t.UpdatedAt,     // updated_at
+			&t.Amount,        // amount
+			&t.Note,          // note
+			&t.Category,      // category
+			&t.SubCategoryId, // sub_category_id
+		)
+		if err != nil {
+			return nil, err
+		}
+		transactions = append(transactions, t)
+	}
+
+	return transactions, nil
+}
+
+func (r *TransactionRepository) ListIncomes() ([]Transaction, error) {
+	rows, err := r.db.Query(`
+		SELECT * FROM transactions WHERE category = $1`, "income")
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var transactions []Transaction
+
+	for rows.Next() {
+		var t Transaction
+		err := rows.Scan(
+			&t.TransactionId, // transaction_id
+			&t.Date,          // date
+			&t.CreatedAt,     // created_at
+			&t.UpdatedAt,     // updated_at
+			&t.Amount,        // amount
+			&t.Note,          // note
+			&t.Category,      // category
+			&t.SubCategoryId, // sub_category_id
+		)
+		if err != nil {
+			return nil, err
+		}
+		transactions = append(transactions, t)
+	}
+
+	return transactions, nil
+}
+
 func (r *TransactionRepository) GetById(id int) (*Transaction, error) {
 	row := r.db.QueryRow(`
 		SELECT transaction_id, date, created_at, updated_at, amount, note, category, sub_category_id

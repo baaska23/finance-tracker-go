@@ -37,7 +37,7 @@ func (t *TransactionService) CreateTransaction(req Transaction) (*Transaction, e
 	return newTransaction, nil
 }
 
-func (t *TransactionService) UpdateTransaction(req TransactionPatch) (*Transaction, error) {
+func (t *TransactionService) UpdateTransaction(id int, req TransactionPatch) (*Transaction, error) {
 	selectedTransaction, err := t.GetById(*req.TransactionId)
 	if err != nil {
 		return nil, err
@@ -64,8 +64,8 @@ func (t *TransactionService) UpdateTransaction(req TransactionPatch) (*Transacti
 	return selectedTransaction, nil
 }
 
-func (t *TransactionService) DeleteTransaction(req Transaction) (*Transaction, error) {
-	selectedTransaction, err := t.repo.GetById(req.TransactionId)
+func (t *TransactionService) DeleteTransaction(id int) (*Transaction, error) {
+	selectedTransaction, err := t.repo.GetById(id)
 	if err != nil {
 		return nil, err
 	}
@@ -84,6 +84,22 @@ func (t *TransactionService) ListTransaction() ([]Transaction, error) {
 		return nil, err
 	}
 	return transactions, nil
+}
+
+func (t *TransactionService) ListExpenses() ([]Transaction, error) {
+	transactions, err := t.repo.ListExpenses()
+	if err != nil {
+		return nil, err
+	}
+	return transactions, err
+}
+
+func (t *TransactionService) ListIncomes() ([]Transaction, error) {
+	transactions, err := t.repo.ListIncomes()
+	if err != nil {
+		return nil, err
+	}
+	return transactions, err
 }
 
 func (t *TransactionService) GetById(id int) (*Transaction, error) {

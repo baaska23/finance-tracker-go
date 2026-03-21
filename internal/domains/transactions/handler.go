@@ -40,8 +40,26 @@ func (handler *TransactionHandler) ListAll(c *gin.Context) {
 	c.JSON(http.StatusOK, transactions)
 }
 
+func (handler *TransactionHandler) ListExpenses(c *gin.Context) {
+	transactions, err := handler.service.ListExpenses()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, transactions)
+}
+
+func (handler *TransactionHandler) ListIncomes(c *gin.Context) {
+	transactions, err := handler.service.ListIncomes()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, transactions)
+}
+
 func (handler *TransactionHandler) GetById(c *gin.Context) {
-	idParam := c.Query("id")
+	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
@@ -58,7 +76,7 @@ func (handler *TransactionHandler) GetById(c *gin.Context) {
 }
 
 func (handler *TransactionHandler) Update(c *gin.Context) {
-	idParam := c.Query("id")
+	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid transaction"})
@@ -72,8 +90,7 @@ func (handler *TransactionHandler) Update(c *gin.Context) {
 	}
 	req.TransactionId = &id
 
-	transaction, err := handler.service.UpdateTransaction(req)
-
+	transaction, err := handler.service.UpdateTransaction(id, req)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
@@ -82,23 +99,15 @@ func (handler *TransactionHandler) Update(c *gin.Context) {
 	c.JSON(http.StatusOK, transaction)
 }
 
-func (handler *TransactionHandler) Delete(c *gin.Context){
-	idParam := c.Query("id")
+func (handler *TransactionHandler) Delete(c *gin.Context) {
+	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid transaction"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid transaction id"})
 		return
 	}
 
-	var req Transaction
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
-		return
-	}
-	req.TransactionId = id
-
-	transaction, err := handler.service.DeleteTransaction(req)
-
+	transaction, err := handler.service.DeleteTransaction(id)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
