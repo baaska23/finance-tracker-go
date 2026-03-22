@@ -168,3 +168,79 @@ func (r *TransactionRepository) Create(t *Transaction) error {
 		t.Date, t.CreatedAt, t.UpdatedAt, t.Amount, t.Note, t.Category, t.SubCategoryId,
 	).Scan(&t.TransactionId)
 }
+
+func (r *TransactionRepository) GetTotalByMonth(month string) (Total, error) {
+	incomes, err := r.db.Query(`
+        SELECT amount FROM transactions WHERE category = $1 AND to_char(date, 'YYYY-MM') = $2`, "income", month)
+	if err != nil {
+		return Total{}, err
+	}
+	var totalIncome float64
+	for incomes.Next() {
+		var amount float64
+		if err := incomes.Scan(&amount); err != nil {
+			incomes.Close()
+			return Total{}, err
+		}
+		totalIncome += amount
+	}
+	incomes.Close()
+	if err := incomes.Err(); err != nil {
+		return Total{}, err
+	}
+
+	expenses, err := r.db.Query(`
+        SELECT amount FROM transactions WHERE category = $1 AND to_char(date, 'YYYY-MM') = $2`, "expense", month)
+	if err != nil {
+		return Total{}, err
+	}
+	var totalExpense float64
+	for expenses.Next() {
+		var amount float64
+		if err := expenses.Scan(&amount); err != nil {
+			expenses.Close()
+			return Total{}, err
+		}
+		totalExpense += amount
+	}
+	expenses.Close()
+	if err := expenses.Err(); err != nil {
+		return Total{}, err
+	}
+
+	total := Total{Income: &totalIncome, Expense: &totalExpense}
+	return total, nil
+}
+
+func (r *TransactionRepository) GetSummaryByMonth(month string) ([]Transaction, error) {
+	rows, err := r.db.Query(`
+		SELECT * FROM transactions WHERE to_char(date, 'YYYY-MM') = $1`, month)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var transactions []Transaction
+
+	for rows.Next() {
+		var t Transaction
+		err := rows.Scan(
+			&t.TransactionId, // transaction_id
+			&t.Date,          // date
+			&t.CreatedAt,     // created_at
+			&t.UpdatedAt,     // updated_at
+			&t.Amount,        // amount
+			&t.Note,          // note
+			&t.Category,      // category
+			&t.SubCategoryId, // sub_category_id
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		transactions = append(transactions, t)
+	}
+
+	return transactions, nil
+}

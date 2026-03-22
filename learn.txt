@@ -3,7 +3,7 @@ Lowercase - transactionService - is unexported and accessible within the same pa
 
 Go's json.Unmarshal is case-insensitive for most fields — so "Amount" still maps to json:"amount", "Note" → json:"note" etc. But "SubCategoryId" vs "sub_category_id" are too different for it to match automatically.
 
-GET     /transactions/summary                        - total income, expense, balance
+GET     /transactions/total?month=2025-03                        - total income, expense, balance
 GET     /transactions/summary?month=2025-03          - filter by month
-GET     /transactions/by-category                    - spending grouped by category
-GET     /transactions/by-subcategory                 - spending grouped by sub category
+
+GET     /transactions/by-subcategory?month=2025-03                - spending grouped by sub category?month=2025-03

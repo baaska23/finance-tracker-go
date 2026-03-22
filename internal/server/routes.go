@@ -27,6 +27,9 @@ func (s *Server) RegisterRoutes() http.Handler {
 		transactionRoutes.PATCH("/:id", s.TransactionHandler.Update)
 		transactionRoutes.POST("/create", s.TransactionHandler.Create)
 		transactionRoutes.DELETE("/:id", s.TransactionHandler.Delete)
+
+		transactionRoutes.GET("/total-month/:month", s.TransactionHandler.GetTotalByMonth)
+		transactionRoutes.GET("/summary-month/:month", s.TransactionHandler.GetSummaryByMonth)
 	}
 
 	subCategoryRoutes := r.Group("/sub-categories")

@@ -58,6 +58,28 @@ func (handler *TransactionHandler) ListIncomes(c *gin.Context) {
 	c.JSON(http.StatusOK, transactions)
 }
 
+func (handler *TransactionHandler) GetTotalByMonth(c *gin.Context) {
+	month := c.Param("month")
+	totals, err := handler.service.GetTotalByMonth(month)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, totals)
+}
+
+func (handler *TransactionHandler) GetSummaryByMonth(c *gin.Context){
+	month := c.Param("month")
+	transactions, err := handler.service.GetSummaryByMonth(month)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, transactions)
+}
+
 func (handler *TransactionHandler) GetById(c *gin.Context) {
 	idParam := c.Param("id")
 	id, err := strconv.Atoi(idParam)

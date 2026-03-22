@@ -31,3 +31,8 @@ type TransactionPatch struct {
 	Category      *string       `json:"category"`
 	SubCategoryId *int          `json:"sub_category_id"`
 }
+
+type Total struct {
+	Expense *float64
+	Income  *float64
+}

@@ -109,3 +109,19 @@ func (t *TransactionService) GetById(id int) (*Transaction, error) {
 	}
 	return transaction, nil
 }
+
+func (t *TransactionService) GetTotalByMonth(month string) (Total, error) {
+	totals, err := t.repo.GetTotalByMonth(month)
+	if err != nil {
+		return Total{}, err
+	}
+	return totals, err
+}
+
+func (t *TransactionService) GetSummaryByMonth(month string) ([]Transaction, error) {
+	transactions, err := t.repo.GetSummaryByMonth(month)
+	if err != nil {
+		return nil, err
+	}
+	return transactions, err
+}
