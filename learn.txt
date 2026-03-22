@@ -3,26 +3,7 @@ Lowercase - transactionService - is unexported and accessible within the same pa
 
 Go's json.Unmarshal is case-insensitive for most fields — so "Amount" still maps to json:"amount", "Note" → json:"note" etc. But "SubCategoryId" vs "sub_category_id" are too different for it to match automatically.
 
-
-transactionRoutes := r.Group("/transactions")
-{
-    transactionRoutes.GET("/all", s.TransactionHandler.ListAll)
-    transactionRoutes.GET("/:id", s.TransactionHandler.GetById)        // use param
-    transactionRoutes.GET("/expense", s.TransactionHandler.ListExpenses)
-    transactionRoutes.GET("/income", s.TransactionHandler.ListIncomes)
-    transactionRoutes.GET("/summary", s.TransactionHandler.Summary)    // new
-    transactionRoutes.GET("/by-category", s.TransactionHandler.ByCategory) // new
-
-    transactionRoutes.POST("/create", s.TransactionHandler.Create)
-    transactionRoutes.PATCH("/:id", s.TransactionHandler.Update)       // use param
-    transactionRoutes.DELETE("/:id", s.TransactionHandler.Delete)      // use param
-}
-
-subCategoryRoutes := r.Group("/sub-categories")
-{
-    subCategoryRoutes.GET("/all", s.SubCategoryHandler.ListAll)
-    subCategoryRoutes.GET("/:id", s.SubCategoryHandler.GetById)
-    subCategoryRoutes.POST("/create", s.SubCategoryHandler.Create)
-    subCategoryRoutes.PATCH("/:id", s.SubCategoryHandler.Update)
-    subCategoryRoutes.DELETE("/:id", s.SubCategoryHandler.Delete)
-}
+GET     /transactions/summary                        - total income, expense, balance
+GET     /transactions/summary?month=2025-03          - filter by month
+GET     /transactions/by-category                    - spending grouped by category
+GET     /transactions/by-subcategory                 - spending grouped by sub category

@@ -29,5 +29,16 @@ func (s *Server) RegisterRoutes() http.Handler {
 		transactionRoutes.DELETE("/:id", s.TransactionHandler.Delete)
 	}
 
+	subCategoryRoutes := r.Group("/sub-categories")
+	{
+		subCategoryRoutes.GET("/:id", s.SubcategoryHandler.GetById)
+		subCategoryRoutes.GET("/expense", s.SubcategoryHandler.ListExpenseTypes)
+		subCategoryRoutes.GET("/income", s.SubcategoryHandler.ListIncomeTypes)
+
+		subCategoryRoutes.POST("/create", s.SubcategoryHandler.Create)
+		subCategoryRoutes.PATCH("/:id", s.SubcategoryHandler.Update)
+		subCategoryRoutes.DELETE("/:id", s.SubcategoryHandler.Delete)
+	}
+
 	return r
 }
