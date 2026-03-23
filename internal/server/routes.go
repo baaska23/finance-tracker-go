@@ -1,6 +1,7 @@
 package server
 
 import (
+	"ft-service/internal/platform/middleware"
 	"net/http"
 
 	"github.com/gin-contrib/cors"
@@ -19,7 +20,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	transactionRoutes := r.Group("/transactions")
 	{
-		transactionRoutes.GET("/all", s.TransactionHandler.ListAll)
+		transactionRoutes.GET("/all", middleware.BasicAuth(), s.TransactionHandler.ListAll)
 		transactionRoutes.GET("/:id", s.TransactionHandler.GetById)
 		transactionRoutes.GET("/expense", s.TransactionHandler.ListExpenses)
 		transactionRoutes.GET("/income", s.TransactionHandler.ListIncomes)
