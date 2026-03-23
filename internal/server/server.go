@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"ft-service/internal/domains/budgets"
 	"ft-service/internal/domains/subcategories"
 	"ft-service/internal/domains/transactions"
 	"ft-service/internal/platform/database"
@@ -13,6 +14,7 @@ type Server struct {
 	DBManager          *database.DBManager
 	TransactionHandler *transactions.TransactionHandler
 	SubcategoryHandler *subcategories.SubcategoryHandler
+	BudgetHandler      *budgets.BudgetHandler
 }
 
 func NewServer() *http.Server {
@@ -29,10 +31,15 @@ func NewServer() *http.Server {
 	subcategoryService := subcategories.NewSubCategoryService(subcategoryRepo)
 	subcategoryHandler := subcategories.NewSubcategoryHandler(subcategoryService)
 
+	budgetRepo := budgets.NewBudgetRepository(dbManager.NeonDB)
+	budgetService := budgets.NewBudgetService(budgetRepo)
+	budgetHandler := budgets.NewBudgetHandler(budgetService)
+
 	srv := Server{
 		DBManager:          dbManager,
 		TransactionHandler: transactionHandler,
 		SubcategoryHandler: subcategoryHandler,
+		BudgetHandler:      budgetHandler,
 	}
 
 	server := &http.Server{

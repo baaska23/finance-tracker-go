@@ -21,27 +21,35 @@ func (s *Server) RegisterRoutes() http.Handler {
 	transactionRoutes := r.Group("/transactions")
 	{
 		transactionRoutes.GET("/all", middleware.BasicAuth(), s.TransactionHandler.ListAll)
-		transactionRoutes.GET("/:id", s.TransactionHandler.GetById)
-		transactionRoutes.GET("/expense", s.TransactionHandler.ListExpenses)
-		transactionRoutes.GET("/income", s.TransactionHandler.ListIncomes)
+		transactionRoutes.GET("/:id", middleware.BasicAuth(), s.TransactionHandler.GetById)
+		transactionRoutes.GET("/expense", middleware.BasicAuth(), s.TransactionHandler.ListExpenses)
+		transactionRoutes.GET("/income", middleware.BasicAuth(), s.TransactionHandler.ListIncomes)
 
-		transactionRoutes.PATCH("/:id", s.TransactionHandler.Update)
-		transactionRoutes.POST("/create", s.TransactionHandler.Create)
-		transactionRoutes.DELETE("/:id", s.TransactionHandler.Delete)
+		transactionRoutes.PATCH("/:id", middleware.BasicAuth(), s.TransactionHandler.Update)
+		transactionRoutes.POST("/create", middleware.BasicAuth(), s.TransactionHandler.Create)
+		transactionRoutes.DELETE("/:id", middleware.BasicAuth(), s.TransactionHandler.Delete)
 
-		transactionRoutes.GET("/total-month/:month", s.TransactionHandler.GetTotalByMonth)
-		transactionRoutes.GET("/summary-month/:month", s.TransactionHandler.GetSummaryByMonth)
+		transactionRoutes.GET("/total-month/:month", middleware.BasicAuth(), s.TransactionHandler.GetTotalByMonth)
+		transactionRoutes.GET("/summary-month/:month", middleware.BasicAuth(), s.TransactionHandler.GetSummaryByMonth)
 	}
 
 	subCategoryRoutes := r.Group("/sub-categories")
 	{
-		subCategoryRoutes.GET("/:id", s.SubcategoryHandler.GetById)
-		subCategoryRoutes.GET("/expense", s.SubcategoryHandler.ListExpenseTypes)
-		subCategoryRoutes.GET("/income", s.SubcategoryHandler.ListIncomeTypes)
+		subCategoryRoutes.GET("/:id", middleware.BasicAuth(), s.SubcategoryHandler.GetById)
+		subCategoryRoutes.GET("/expense", middleware.BasicAuth(), s.SubcategoryHandler.ListExpenseTypes)
+		subCategoryRoutes.GET("/income", middleware.BasicAuth(), s.SubcategoryHandler.ListIncomeTypes)
 
-		subCategoryRoutes.POST("/create", s.SubcategoryHandler.Create)
-		subCategoryRoutes.PATCH("/:id", s.SubcategoryHandler.Update)
-		subCategoryRoutes.DELETE("/:id", s.SubcategoryHandler.Delete)
+		subCategoryRoutes.POST("/create", middleware.BasicAuth(), s.SubcategoryHandler.Create)
+		subCategoryRoutes.PATCH("/:id", middleware.BasicAuth(), s.SubcategoryHandler.Update)
+		subCategoryRoutes.DELETE("/:id", middleware.BasicAuth(), s.SubcategoryHandler.Delete)
+	}
+
+	budgetRoutes := r.Group("/budgets")
+	{
+		budgetRoutes.GET("/:category_id/:month", middleware.BasicAuth(), s.BudgetHandler.GetById)
+		budgetRoutes.PUT("/:category_id/:month", middleware.BasicAuth(), s.BudgetHandler.Update)
+		budgetRoutes.DELETE("/:category_id/:month", middleware.BasicAuth(), s.BudgetHandler.Delete)
+		budgetRoutes.POST("/set-multi-year", middleware.BasicAuth(), s.BudgetHandler.SetMultiYear)
 	}
 
 	return r
